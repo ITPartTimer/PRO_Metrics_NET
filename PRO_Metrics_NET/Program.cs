@@ -22,6 +22,7 @@ namespace PRO_Metrics_NET
             string date1 = "";
             string date2 = "";
             string brh = "";
+            bool emailIt = false;
 
             /*
              * Copy empty Metric File from templates to metric folder
@@ -37,18 +38,26 @@ namespace PRO_Metrics_NET
             string fullPath = Path.Combine(destPath, fileName);
 
             #region Args
+            /*
+             * arg options:
+             * 1. Branch Email
+             * 2. Branch Email StartDate StopDate
+             * Branch = SW, CS, AR or MS
+             * Email = true or false
+             */
             try
             {
-                if (args.Length == 0)
+                if ((args.Length == 0) || (args.Length == 1))
                 {                   
-                    Logger.LogWrite("MSG", "No args present");
-                    //return;
-                    Console.WriteLine("No args present");
+                    Logger.LogWrite("MSG", "Invalid number of args[]");
+                    Logger.LogWrite("MSG", "Return on args[]");
+                    return;
                 }
-                else if (args.Length == 1)
+                else if (args.Length == 2)
                 {
                     // 1st arg should be the Brh
                     brh = args[0].ToString();
+                    emailIt = Convert.ToBoolean(args[1]);
 
                     /*
                      * Next two args are date range, but not
@@ -308,56 +317,64 @@ namespace PRO_Metrics_NET
             #endregion
 
             #region Email
-            // Get list of emails to receive report
-            List<EmployeesReportsModel> lstEmpReports = new List<EmployeesReportsModel>();
-
-            SQLData objSQL_Rpts = new SQLData();
-
-            try
+            /*
+             * Emailing the file is optoinal
+             * emailIt = true or false
+             */
+            if (emailIt)
             {
-                lstEmpReports = objSQL_Rpts.Get_Emp_Reports(brh, "MetricsDaily");
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWrite("EXC", ex);
-                Logger.LogWrite("MSG", "Return on Emp Rpts");
-                return;
-            }
+                List<EmployeesReportsModel> lstEmpReports = new List<EmployeesReportsModel>();
 
-            try
-            {
-                MailMessage mail = new MailMessage();
+                SQLData objSQL_Rpts = new SQLData();
 
-                SmtpClient SmtpServer = new SmtpClient("smtp.office365.com");
-
-                mail.From = new MailAddress("sclemons@calstripsteel.com");
-                mail.Subject = brh + " - Daily";
-                mail.Body = "Report attached";
-
-                //Build To: line from emails in list of EmployeesReportsModel
-                foreach (EmployeesReportsModel e in lstEmpReports)
+                try
                 {
-                    Logger.LogWrite("MSG",e.email.ToString());
-                    mail.To.Add(e.email.ToString());
+                    lstEmpReports = objSQL_Rpts.Get_Emp_Reports(brh, "MetricsDaily");
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWrite("EXC", ex);
+                    Logger.LogWrite("MSG", "Return on Emp Rpts");
+                    return;
                 }
 
-                // Add attachment
-                Attachment attach;
-                attach = new Attachment(fullPath);
-                mail.Attachments.Add(attach);
+                try
+                {
+                    MailMessage mail = new MailMessage();
 
-                SmtpServer.Port = 587;
-                SmtpServer.Credentials = new System.Net.NetworkCredential("sclemons@calstripsteel.com", "Smet@524");
-                SmtpServer.EnableSsl = true;
+                    SmtpClient SmtpServer = new SmtpClient("smtp.office365.com");
 
-                SmtpServer.Send(mail);
+                    mail.From = new MailAddress("sclemons@calstripsteel.com");
+                    mail.Subject = brh + " - Daily";
+                    mail.Body = "Report attached";
+
+                    //Build To: line from emails in list of EmployeesReportsModel
+                    foreach (EmployeesReportsModel e in lstEmpReports)
+                    {
+                        Logger.LogWrite("MSG", "Email: " + e.email.ToString());
+                        mail.To.Add(e.email.ToString());
+                    }
+
+                    // Add attachment
+                    Attachment attach;
+                    attach = new Attachment(fullPath);
+                    mail.Attachments.Add(attach);
+
+                    SmtpServer.Port = 587;
+                    SmtpServer.Credentials = new System.Net.NetworkCredential("sclemons@calstripsteel.com", "Smet@524");
+                    SmtpServer.EnableSsl = true;
+
+                    SmtpServer.Send(mail);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWrite("EXC", ex);
+                    Logger.LogWrite("MSG", "Return on Email");
+                    return;
+                }
             }
-            catch (Exception ex)
-            {
-                Logger.LogWrite("EXC", ex);
-                Logger.LogWrite("MSG", "Return on Email");
-                return;
-            }
+            else
+                Logger.LogWrite("MSG", "No email");
             #endregion
 
             // Made it to the end
