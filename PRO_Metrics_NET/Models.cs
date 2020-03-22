@@ -3,30 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace PRO_Metrics_NET.Models
-{
-    public class ReportsModel
-    {
-        public int rptID { get; set; }
-        public string name { get; set; }
-        public string temppath { get; set; }
-        public string rootpath { get; set; }
-        public string filename { get; set; }
-        public string fullpath { get; set; }
-        public string frq { get; set; }
-        public string typ { get; set; }
-    }
-
+{  
     public class EmployeesReportsModel
     {
         public int rptID { get; set; }
         public string email { get; set; }
-        public string name { get; set; }
         public string temppath { get; set; }
         public string rootpath { get; set; }
         public string filename { get; set; }
-        public string fullpath { get; set; }
-        public string frq { get; set; }
-        public string typ { get; set; }
+        public string fullpath { get; set; }      
     }
 
     public class BookingsModel
@@ -60,7 +45,7 @@ namespace PRO_Metrics_NET.Models
     public class ProdPWCModel
     {
         public int workDy { get; set; }
-        public int prodDt { get; set; }
+        public DateTime prodDt { get; set; }
         public string pwc { get; set; }
         public int jobs { get; set; }
         public int lbs { get; set; }
@@ -72,7 +57,7 @@ namespace PRO_Metrics_NET.Models
     public class ProdALLModel
     {
         public int workDy { get; set; }
-        public int prodDt { get; set; }
+        public DateTime prodDt { get; set; }
         public int lbs60S { get; set; }
         public int jobs60S { get; set; }
         public int lbs72S { get; set; }

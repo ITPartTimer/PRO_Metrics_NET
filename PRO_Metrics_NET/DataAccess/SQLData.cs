@@ -12,6 +12,49 @@ namespace PRO_Metrics_NET.DataAccess
 {
     public class SQLData : Helpers
     {
+        public List<EmployeesReportsModel> Get_Emp_Reports(string brh, string name)
+        {
+            List<EmployeesReportsModel> lst = new List<EmployeesReportsModel>();
+
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader rdr = default(SqlDataReader);
+
+            SqlConnection conn = new SqlConnection(STRATIXDataConnString);
+
+            using (conn)
+            {
+                conn.Open();
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "RPT_LKU_proc_Emails_ByBrh_ByRptName";
+                cmd.Connection = conn;
+
+                AddParamToSQLCmd(cmd, "@brh", SqlDbType.VarChar, 2, ParameterDirection.Input, brh);
+                AddParamToSQLCmd(cmd, "@name", SqlDbType.VarChar, 25, ParameterDirection.Input, name);
+
+                rdr = cmd.ExecuteReader();
+
+                using (rdr)
+                {
+                    while (rdr.Read())
+                    {
+                        EmployeesReportsModel r = new EmployeesReportsModel();
+
+                        r.rptID = (int)rdr["RptID"];
+                        r.email = (string)rdr["EmpEmail"];
+                        r.temppath = (string)rdr["RptTempPath"];
+                        r.rootpath = (string)rdr["RptRootPath"];
+                        r.filename = (string)rdr["RptFileName"];
+                        r.fullpath = (string)rdr["RptFullPath"];                       
+
+                        lst.Add(r);
+                    }
+                }
+            }
+
+            return lst;
+        }
+
         public List<string> Get_PWC_ByBrh(string brh)
         {           
             List<string> pwcList = new List<string>();
@@ -261,7 +304,7 @@ namespace PRO_Metrics_NET.DataAccess
                             ProdPWCModel m = new ProdPWCModel();
 
                             m.workDy = (int)rdr["WORK_DY"];
-                            m.prodDt = (int)rdr["PROD_DT"];
+                            m.prodDt = (DateTime)rdr["PROD_DT"];
                             m.pwc = rdr["PWC"].ToString();
                             m.jobs = (int)rdr["JOBS"];
                             m.lbs = (int)rdr["LBS"];
@@ -324,7 +367,7 @@ namespace PRO_Metrics_NET.DataAccess
                             ProdALLModel m = new ProdALLModel();
 
                             m.workDy = (int)rdr["WORK_DY"];
-                            m.prodDt = (int)rdr["PROD_DT"];
+                            m.prodDt = (DateTime)rdr["PROD_DT"];
                             m.jobs60S = (int)rdr["JOBS_60S"];
                             m.lbs60S = (int)rdr["LBS_60S"];
                             m.jobs72S = (int)rdr["JOBS_72S"];
@@ -351,6 +394,71 @@ namespace PRO_Metrics_NET.DataAccess
             }
 
             return lstProdAll;
+        }
+
+        public List<ProdALLModel> Get_Prod_All(string pwc, string date1, string date2)
+        {
+            /*
+             * pwc = ALL.  Not in PWC table in SQL Server.
+             * Creates a table with a column for each PWC
+             */
+            List<ProdALLModel> lstProd = new List<ProdALLModel>();
+
+            SqlConnection conn = new SqlConnection(STRATIXDataConnString);
+            SqlCommand cmd = new SqlCommand();
+
+            SqlDataReader rdr = default(SqlDataReader);
+
+            try
+            {
+                using (conn)
+                {
+                    conn.Open();
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
+                    cmd.Connection = conn;
+
+                    AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
+                    AddParamToSQLCmd(cmd, "@date2", SqlDbType.DateTime, 4, ParameterDirection.Input, date2);
+                    AddParamToSQLCmd(cmd, "@pwc", SqlDbType.VarChar, 3, ParameterDirection.Input, pwc);
+
+                    rdr = cmd.ExecuteReader();
+
+                    using (rdr)
+                    {
+                        while (rdr.Read())
+                        {
+                            ProdALLModel m = new ProdALLModel();
+
+                            m.workDy = (int)rdr["WORK_DY"];
+                            m.prodDt = (DateTime)rdr["PROD_DT"];
+                            m.jobs60S = (int)rdr["JOBS_60S"];
+                            m.lbs60S = (int)rdr["LBS_60S"];
+                            m.jobs72S = (int)rdr["JOBS_72S"];
+                            m.lbs72S = (int)rdr["LBS_72S"];
+                            m.jobsCTL = (int)rdr["JOBS_CTL"];
+                            m.lbsCTL = (int)rdr["LBS_CTL"];
+                            m.jobsMSB = (int)rdr["JOBS_MSB"];
+                            m.lbsMSB = (int)rdr["LBS_MSB"];
+
+                            lstProd.Add(m);
+                        }
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+
+            return lstProd;
         }
 
     }
