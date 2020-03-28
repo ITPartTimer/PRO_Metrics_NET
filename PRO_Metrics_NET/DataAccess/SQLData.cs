@@ -104,9 +104,11 @@ namespace PRO_Metrics_NET.DataAccess
             return pwcList;
         }
 
-        public List<BookingsModel> Get_Bookings_ByBrh(string brh, string date1, string date2)
+        public List<BookingsModel> Get_Bookings_ByBrh(string days, string brh, string date1, string date2)
         {
             List<BookingsModel> lstBookings = new List<BookingsModel>();
+
+            string cmdTxt = "";
             
             SqlCommand cmd = new SqlCommand();  
             SqlDataReader rdr = default(SqlDataReader);
@@ -119,8 +121,13 @@ namespace PRO_Metrics_NET.DataAccess
                 {
                     conn.Open();
 
+                    if(days == "WD")
+                        cmdTxt = "SCORE_LKU_proc_Bookings_DateRange_WD_ByBrh_Agg";
+                    else
+                        cmdTxt = "SCORE_LKU_proc_Bookings_DateRange_All_ByBrh_Agg";
+
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "SCORE_LKU_proc_Bookings_DateRange_WD_ByBrh_Agg";
+                    cmd.CommandText = cmdTxt;
                     cmd.Connection = conn;
 
                     AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
@@ -159,9 +166,11 @@ namespace PRO_Metrics_NET.DataAccess
             return lstBookings;
         }
 
-        public List<SalesModel> Get_Sales_ByBrh(string brh, string date1, string date2)
+        public List<SalesModel> Get_Sales_ByBrh(string days, string brh, string date1, string date2)
         {
             List<SalesModel> lstSales = new List<SalesModel>();
+
+            string cmdTxt = "";
 
             SqlConnection conn = new SqlConnection(STRATIXDataConnString);
             SqlCommand cmd = new SqlCommand();
@@ -174,8 +183,13 @@ namespace PRO_Metrics_NET.DataAccess
                 {
                     conn.Open();
 
+                    if (days == "WD")
+                        cmdTxt = "SCORE_LKU_proc_Sales_DateRange_WD_ByBrh_Agg";
+                    else
+                        cmdTxt = "SCORE_LKU_proc_Sales_DateRange_All_ByBrh_Agg";
+
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "SCORE_LKU_proc_Sales_DateRange_WD_ByBrh_Agg";
+                    cmd.CommandText = cmdTxt;
                     cmd.Connection = conn;
 
                     AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
@@ -216,9 +230,11 @@ namespace PRO_Metrics_NET.DataAccess
             return lstSales;
         }
 
-        public List<ProdSumModel> Get_Prod_Sum(string date1, string date2)
+        public List<ProdSumModel> Get_Prod_Sum(string days, string date1, string date2)
         {
             List<ProdSumModel> lstProdSum = new List<ProdSumModel>();
+
+            string cmdTxt = "";
 
             SqlConnection conn = new SqlConnection(STRATIXDataConnString);
             SqlCommand cmd = new SqlCommand();
@@ -231,8 +247,13 @@ namespace PRO_Metrics_NET.DataAccess
                 {
                     conn.Open();
 
+                    if (days == "WD")
+                        cmdTxt = "ST_PROD_LKU_proc_Jobs_DateRange_WD";
+                    else
+                        cmdTxt = "ST_PROD_LKU_proc_Jobs_DateRange_All";
+
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "ST_PROD_LKU_proc_Jobs_DateRange_WD";
+                    cmd.CommandText = cmdTxt;
                     cmd.Connection = conn;
 
                     AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
@@ -272,9 +293,11 @@ namespace PRO_Metrics_NET.DataAccess
             return lstProdSum;
         }
 
-        public List<ProdPWCModel> Get_Prod_PWC_ByPWC(string pwc, string date1, string date2)
+        public List<ProdPWCModel> Get_Prod_PWC_ByPWC(string days, string pwc, string date1, string date2)
         {
             List<ProdPWCModel> lstProd = new List<ProdPWCModel>();
+
+            string cmdTxt = "";
 
             SqlConnection conn = new SqlConnection(STRATIXDataConnString);
             SqlCommand cmd = new SqlCommand();
@@ -287,8 +310,13 @@ namespace PRO_Metrics_NET.DataAccess
                 {
                     conn.Open();
 
+                    if (days == "WD")
+                        cmdTxt = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
+                    else
+                        cmdTxt = "ST_PROD_LKU_proc_DateRange_All_ByPWC_Agg";
+
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
+                    cmd.CommandText = cmdTxt;
                     cmd.Connection = conn;
 
                     AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
@@ -331,72 +359,72 @@ namespace PRO_Metrics_NET.DataAccess
             return lstProd;
         }
 
-        public List<ProdALLModel> Get_Prod_PWC_All(string date1, string date2)
-        {
-            List<ProdALLModel> lstProdAll = new List<ProdALLModel>();
+        //public List<ProdALLModel> Get_Prod_PWC_All(string days, string date1, string date2)
+        //{
+        //    List<ProdALLModel> lstProdAll = new List<ProdALLModel>();
 
-            SqlConnection conn = new SqlConnection(STRATIXDataConnString);
-            SqlCommand cmd = new SqlCommand();
+        //    SqlConnection conn = new SqlConnection(STRATIXDataConnString);
+        //    SqlCommand cmd = new SqlCommand();
 
-            SqlDataReader rdr = default(SqlDataReader);
+        //    SqlDataReader rdr = default(SqlDataReader);
 
-            try
-            {
-                using (conn)
-                {
-                    /*
-                     * Using same SP as Get_Prod_PWC_ByPWC, but data returned
-                     * is in a different format.  PWC is ALL.
-                     */
-                    conn.Open();
+        //    try
+        //    {
+        //        using (conn)
+        //        {
+        //            /*
+        //             * Using same SP as Get_Prod_PWC_ByPWC, but data returned
+        //             * is in a different format.  PWC is ALL.
+        //             */
+        //            conn.Open();
 
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
-                    cmd.Connection = conn;
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.CommandText = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
+        //            cmd.Connection = conn;
 
-                    AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
-                    AddParamToSQLCmd(cmd, "@date2", SqlDbType.DateTime, 4, ParameterDirection.Input, date2);
-                    AddParamToSQLCmd(cmd, "@pwc", SqlDbType.VarChar, 3, ParameterDirection.Input, "ALL");
+        //            AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
+        //            AddParamToSQLCmd(cmd, "@date2", SqlDbType.DateTime, 4, ParameterDirection.Input, date2);
+        //            AddParamToSQLCmd(cmd, "@pwc", SqlDbType.VarChar, 3, ParameterDirection.Input, "ALL");
 
-                    rdr = cmd.ExecuteReader();
+        //            rdr = cmd.ExecuteReader();
 
-                    using (rdr)
-                    {
-                        while (rdr.Read())
-                        {
-                            ProdALLModel m = new ProdALLModel();
+        //            using (rdr)
+        //            {
+        //                while (rdr.Read())
+        //                {
+        //                    ProdALLModel m = new ProdALLModel();
 
-                            m.workDy = (int)rdr["WORK_DY"];
-                            m.prodDt = (DateTime)rdr["PROD_DT"];
-                            m.jobs60S = (int)rdr["JOBS_60S"];
-                            m.lbs60S = (int)rdr["LBS_60S"];
-                            m.jobs72S = (int)rdr["JOBS_72S"];
-                            m.lbs72S = (int)rdr["LBS_72S"];
-                            m.jobsCTL = (int)rdr["JOBS_CTL"];
-                            m.lbsCTL = (int)rdr["LBS_CTL"];
-                            m.jobsMSB = (int)rdr["JOBS_MSB"];
-                            m.lbsMSB = (int)rdr["LBS_MSB"];
+        //                    m.workDy = (int)rdr["WORK_DY"];
+        //                    m.prodDt = (DateTime)rdr["PROD_DT"];
+        //                    m.jobs60S = (int)rdr["JOBS_60S"];
+        //                    m.lbs60S = (int)rdr["LBS_60S"];
+        //                    m.jobs72S = (int)rdr["JOBS_72S"];
+        //                    m.lbs72S = (int)rdr["LBS_72S"];
+        //                    m.jobsCTL = (int)rdr["JOBS_CTL"];
+        //                    m.lbsCTL = (int)rdr["LBS_CTL"];
+        //                    m.jobsMSB = (int)rdr["JOBS_MSB"];
+        //                    m.lbsMSB = (int)rdr["LBS_MSB"];
 
-                            lstProdAll.Add(m);
-                        }
+        //                    lstProdAll.Add(m);
+        //                }
                         
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        conn.Close();
+        //        conn.Dispose();
+        //    }
 
-            return lstProdAll;
-        }
+        //    return lstProdAll;
+        //}
 
-        public List<ProdALLModel> Get_Prod_All(string pwc, string date1, string date2)
+        public List<ProdALLModel> Get_Prod_All(string days, string pwc, string date1, string date2)
         {
             /*
              * pwc = ALL.  Not in PWC table in SQL Server.
@@ -404,6 +432,8 @@ namespace PRO_Metrics_NET.DataAccess
              */
             List<ProdALLModel> lstProd = new List<ProdALLModel>();
 
+            string cmdTxt = "";
+
             SqlConnection conn = new SqlConnection(STRATIXDataConnString);
             SqlCommand cmd = new SqlCommand();
 
@@ -415,8 +445,13 @@ namespace PRO_Metrics_NET.DataAccess
                 {
                     conn.Open();
 
+                    if (days == "WD")
+                        cmdTxt = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
+                    else
+                        cmdTxt = "ST_PROD_LKU_proc_DateRange_All_ByPWC_Agg";
+
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandText = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
+                    cmd.CommandText = cmdTxt;
                     cmd.Connection = conn;
 
                     AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);

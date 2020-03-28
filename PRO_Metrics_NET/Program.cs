@@ -22,6 +22,7 @@ namespace PRO_Metrics_NET
             string date1 = "";
             string date2 = "";
             string brh = "";
+            string days = "";
             bool emailIt = false;
 
             /*
@@ -40,24 +41,26 @@ namespace PRO_Metrics_NET
             #region Args
             /*
              * arg options:
-             * 1. Branch Email
-             * 2. Branch Email StartDate StopDate
+             * 1. Branch Email Days
+             * 2. Branch Email Days StartDate StopDate
              * Branch = SW, CS, AR or MS
              * Email = true or false
+             * Days = WD, ALL
              */
             try
             {
-                if ((args.Length == 0) || (args.Length == 1))
+                if ((args.Length == 0) || (args.Length == 1) || (args.Length == 2))
                 {                   
                     Logger.LogWrite("MSG", "Invalid number of args[]");
                     Logger.LogWrite("MSG", "Return on args[]");
                     return;
                 }
-                else if (args.Length == 2)
+                else if (args.Length == 3)
                 {
                     // 1st arg should be the Brh
                     brh = args[0].ToString();
                     emailIt = Convert.ToBoolean(args[1]);
+                    days = args[2].ToString();
 
                     /*
                      * Next two args are date range, but not
@@ -133,7 +136,7 @@ namespace PRO_Metrics_NET
 
             try
             {
-                lstBookings = objSQL.Get_Bookings_ByBrh(brh, date1, date2);
+                lstBookings = objSQL.Get_Bookings_ByBrh(days, brh, date1, date2);
                 // testing
                 Flat.WriteBookingsFlatFile(lstBookings);
             }
@@ -150,7 +153,7 @@ namespace PRO_Metrics_NET
 
             try
             {
-                lstSales = objSQL.Get_Sales_ByBrh(brh, date1, date2);
+                lstSales = objSQL.Get_Sales_ByBrh(days, brh, date1, date2);
                 // testing
                 Flat.WriteSalesFlatFile(lstSales);
             }
@@ -167,7 +170,7 @@ namespace PRO_Metrics_NET
 
             try
             {
-                lstProdSum = objSQL.Get_Prod_Sum(date1, date2);
+                lstProdSum = objSQL.Get_Prod_Sum(days, date1, date2);
                 // testing
                 Flat.WriteProdSumFlatFile(lstProdSum);
             }
@@ -192,7 +195,7 @@ namespace PRO_Metrics_NET
 
                 try
                 {
-                    lstProdPWC = objSQL.Get_Prod_PWC_ByPWC(pwc, date1, date2);
+                    lstProdPWC = objSQL.Get_Prod_PWC_ByPWC(days, pwc, date1, date2);
                     Flat.WriteProdPWCFlatFile(lstProdPWC);
 
                 }
@@ -220,7 +223,7 @@ namespace PRO_Metrics_NET
 
             try
             {
-                lstProdAll = objSQL.Get_Prod_All("ALL", date1, date2);
+                lstProdAll = objSQL.Get_Prod_All(days, "ALL", date1, date2);
                 // testing
                 Flat.WriteProdSumFlatFile(lstProdSum);
             }
