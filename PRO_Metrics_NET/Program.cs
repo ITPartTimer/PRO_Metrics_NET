@@ -18,12 +18,13 @@ namespace PRO_Metrics_NET
         {
             Logger.LogWrite("MSG", "Start: " + DateTime.Now.ToString());
 
-            // Args will change based on STXtoSQL program goal
+            // Args initialization
             string date1 = "";
             string date2 = "";
             string brh = "";
             string days = "";
             bool emailIt = false;
+            bool toll = false;
 
             /*
              * Copy empty Metric File from templates to metric folder
@@ -41,26 +42,28 @@ namespace PRO_Metrics_NET
             #region Args
             /*
              * arg options:
-             * 1. Branch Email Days
-             * 2. Branch Email Days StartDate StopDate
+             * 1. Branch Email Days Toll
+             * 2. Branch Email Days Toll StartDate StopDate
              * Branch = SW, CS, AR or MS
              * Email = true or false
              * Days = WD, ALL
+             * Toll = true or false
              */
             try
             {
-                if ((args.Length == 0) || (args.Length == 1) || (args.Length == 2))
+                if ((args.Length < 4))
                 {                   
                     Logger.LogWrite("MSG", "Invalid number of args[]");
                     Logger.LogWrite("MSG", "Return on args[]");
                     return;
                 }
-                else if (args.Length == 3)
+                else if (args.Length == 4)
                 {
                     // 1st arg should be the Brh
                     brh = args[0].ToString();
                     emailIt = Convert.ToBoolean(args[1]);
                     days = args[2].ToString();
+                    toll = Convert.ToBoolean(args[3]);
 
                     /*
                      * Next two args are date range, but not
@@ -215,7 +218,7 @@ namespace PRO_Metrics_NET
             Flat.WriteProdPWCFlatFile(lstProdPWCAll);
             #endregion
 
-            #region Prod All
+            #region Prod Detail
             /*
              * Get Production for each PWC all on one line for each work day
              */
@@ -231,6 +234,26 @@ namespace PRO_Metrics_NET
             {
                 Logger.LogWrite("EXC", ex);
                 Logger.LogWrite("MSG", "Return on Prod All");
+                return;
+            }
+            #endregion
+
+            #region Combined
+            /*
+             * Get Book, Prod and Sales for all WD in date range in one resultset
+             * PROD tables are brh specific, but SCORE tables require brh value
+             * Report can be run with or without Toll Sales
+             */
+            List<CombinedModel> lstComb = new List<CombinedModel>();
+
+            try
+            {
+                lstComb = objSQL.Get_Combined(date1, date2, brh, toll);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWrite("EXC", ex);
+                Logger.LogWrite("MSG", "Return on Combined");
                 return;
             }
             #endregion
@@ -315,6 +338,18 @@ namespace PRO_Metrics_NET
             {
                 Logger.LogWrite("EXC", ex);
                 Logger.LogWrite("MSG", "Return on Prod by PWC XLS");
+                return;
+            }
+
+            // Combined - Tab
+            try
+            {
+                objXLS.WriteCombined(lstComb, fullPath);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWrite("EXC", ex);
+                Logger.LogWrite("MSG", "Return on Combined XLS");
                 return;
             }
             #endregion

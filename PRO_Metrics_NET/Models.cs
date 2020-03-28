@@ -86,4 +86,13 @@ namespace PRO_Metrics_NET.Models
         public decimal gauge { get; set; }
         public decimal wdth { get; set; }
     }
+
+    public class CombinedModel
+    {
+        public int workDy { get; set; }
+        public DateTime weekDt { get; set; }
+        public int bkDly { get; set; }
+        public int prodDly { get; set; }
+        public int slsDly { get; set; }
+    }
 }

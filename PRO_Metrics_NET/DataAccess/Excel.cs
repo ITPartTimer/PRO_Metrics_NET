@@ -300,6 +300,62 @@ namespace PRO_Metrics_NET.DataAccess
             }
         }
 
+        public void WriteCombined(List<CombinedModel> lstComb, string fullPath)
+        {
+            // initialize text used in OleDbCommand
+            string cmdText = "";
+
+            string excelConnString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + fullPath + @";Extended Properties=""Excel 8.0;HDR=YES;""";
+
+            using (OleDbConnection eConn = new OleDbConnection(excelConnString))
+            {
+                try
+                {
+                    eConn.Open();
+
+                    OleDbCommand eCmd = new OleDbCommand();
+
+                    eCmd.Connection = eConn;
+
+                    // Loop through each record and add yesterday details to XLS
+                    foreach (CombinedModel m in lstComb)
+                    {
+                        // Use parameters to insert into XLS
+                        cmdText = "Insert into [Combined$] (WORK_DY,WEEK_DT,BOOK,PROD,SALES) Values(@dy,@dt,@bk,@prd,@sls)";
+
+                        eCmd.CommandText = cmdText;
+
+                        eCmd.Parameters.AddRange(new OleDbParameter[]
+                        {
+                                    new OleDbParameter("@dy", m.workDy),
+                                    new OleDbParameter("@dt", m.weekDt),
+                                    new OleDbParameter("@bk", m.bkDly),
+                                    new OleDbParameter("@prd", m.prodDly),
+                                    new OleDbParameter("@sls", m.slsDly),
+                        });
+
+                        eCmd.ExecuteNonQuery();
+
+                        // Need to clear Parameters on each pass
+                        eCmd.Parameters.Clear();
+                    }
+                }
+                catch (OleDbException)
+                {
+                    throw;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    eConn.Close();
+                    eConn.Dispose();
+                }
+            }
+        }
+
     }
     
 }

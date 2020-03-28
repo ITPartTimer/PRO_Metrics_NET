@@ -357,72 +357,7 @@ namespace PRO_Metrics_NET.DataAccess
             }
 
             return lstProd;
-        }
-
-        //public List<ProdALLModel> Get_Prod_PWC_All(string days, string date1, string date2)
-        //{
-        //    List<ProdALLModel> lstProdAll = new List<ProdALLModel>();
-
-        //    SqlConnection conn = new SqlConnection(STRATIXDataConnString);
-        //    SqlCommand cmd = new SqlCommand();
-
-        //    SqlDataReader rdr = default(SqlDataReader);
-
-        //    try
-        //    {
-        //        using (conn)
-        //        {
-        //            /*
-        //             * Using same SP as Get_Prod_PWC_ByPWC, but data returned
-        //             * is in a different format.  PWC is ALL.
-        //             */
-        //            conn.Open();
-
-        //            cmd.CommandType = CommandType.StoredProcedure;
-        //            cmd.CommandText = "ST_PROD_LKU_proc_DateRange_WD_ByPWC_Agg";
-        //            cmd.Connection = conn;
-
-        //            AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
-        //            AddParamToSQLCmd(cmd, "@date2", SqlDbType.DateTime, 4, ParameterDirection.Input, date2);
-        //            AddParamToSQLCmd(cmd, "@pwc", SqlDbType.VarChar, 3, ParameterDirection.Input, "ALL");
-
-        //            rdr = cmd.ExecuteReader();
-
-        //            using (rdr)
-        //            {
-        //                while (rdr.Read())
-        //                {
-        //                    ProdALLModel m = new ProdALLModel();
-
-        //                    m.workDy = (int)rdr["WORK_DY"];
-        //                    m.prodDt = (DateTime)rdr["PROD_DT"];
-        //                    m.jobs60S = (int)rdr["JOBS_60S"];
-        //                    m.lbs60S = (int)rdr["LBS_60S"];
-        //                    m.jobs72S = (int)rdr["JOBS_72S"];
-        //                    m.lbs72S = (int)rdr["LBS_72S"];
-        //                    m.jobsCTL = (int)rdr["JOBS_CTL"];
-        //                    m.lbsCTL = (int)rdr["LBS_CTL"];
-        //                    m.jobsMSB = (int)rdr["JOBS_MSB"];
-        //                    m.lbsMSB = (int)rdr["LBS_MSB"];
-
-        //                    lstProdAll.Add(m);
-        //                }
-                        
-        //            }
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        conn.Close();
-        //        conn.Dispose();
-        //    }
-
-        //    return lstProdAll;
-        //}
+        }      
 
         public List<ProdALLModel> Get_Prod_All(string days, string pwc, string date1, string date2)
         {
@@ -494,6 +429,68 @@ namespace PRO_Metrics_NET.DataAccess
             }
 
             return lstProd;
+        }
+
+        public List<CombinedModel> Get_Combined(string date1, string date2, string brh, bool toll)
+        {
+            List<CombinedModel> lstComb = new List<CombinedModel>();
+
+            SqlConnection conn = new SqlConnection(STRATIXDataConnString);
+            SqlCommand cmd = new SqlCommand();
+
+            SqlDataReader rdr = default(SqlDataReader);
+
+            try
+            {
+                using (conn)
+                {
+                    conn.Open();
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "ST_COMBINED_LKU_proc_All_DateRange_WD_ByBrh_Agg";
+                    cmd.Connection = conn;
+
+                    AddParamToSQLCmd(cmd, "@date1", SqlDbType.DateTime, 4, ParameterDirection.Input, date1);
+                    AddParamToSQLCmd(cmd, "@date2", SqlDbType.DateTime, 4, ParameterDirection.Input, date2);
+                    AddParamToSQLCmd(cmd, "@brh", SqlDbType.VarChar, 3, ParameterDirection.Input, brh);
+
+                    // Convert bool type to equivalent bit value for SQL
+                    if (toll)
+                        AddParamToSQLCmd(cmd, "@toll", SqlDbType.Bit, 1, ParameterDirection.Input, 1);
+                    else
+                        AddParamToSQLCmd(cmd, "@toll", SqlDbType.Bit, 1, ParameterDirection.Input, 0);
+
+                    rdr = cmd.ExecuteReader();
+
+                    using (rdr)
+                    {
+                        while (rdr.Read())
+                        {
+                            CombinedModel m = new CombinedModel();
+
+                            m.workDy = (int)rdr["WORK_DY"];
+                            m.weekDt = (DateTime)rdr["WEEK_DT"];
+                            m.bkDly = (int)rdr["BOOK"];
+                            m.prodDly = (int)rdr["PROD"];
+                            m.slsDly = (int)rdr["SALES"];
+
+                            lstComb.Add(m);
+                        }
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+
+            return lstComb;
         }
 
     }
