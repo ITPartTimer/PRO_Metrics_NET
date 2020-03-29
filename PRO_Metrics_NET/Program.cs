@@ -419,8 +419,8 @@ namespace PRO_Metrics_NET
             Logger.LogWrite("MSG", "End: " + DateTime.Now.ToString());
 
             // Testing
-            Console.WriteLine("Press key to exit");
-            Console.ReadKey();
+            //Console.WriteLine("Press key to exit");
+            //Console.ReadKey();
         }
     }
 }

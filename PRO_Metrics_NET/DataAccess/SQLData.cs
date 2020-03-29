@@ -248,9 +248,9 @@ namespace PRO_Metrics_NET.DataAccess
                     conn.Open();
 
                     if (days == "WD")
-                        cmdTxt = "ST_PROD_LKU_proc_Jobs_DateRange_WD";
+                        cmdTxt = "ST_PROD_LKU_proc_DateRange_WD_Agg";
                     else
-                        cmdTxt = "ST_PROD_LKU_proc_Jobs_DateRange_All";
+                        cmdTxt = "ST_PROD_LKU_proc_DateRange_All_Agg";
 
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.CommandText = cmdTxt;
