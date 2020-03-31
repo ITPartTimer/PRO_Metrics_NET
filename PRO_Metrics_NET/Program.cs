@@ -382,7 +382,7 @@ namespace PRO_Metrics_NET
 
                     SmtpClient SmtpServer = new SmtpClient("smtp.office365.com");
 
-                    mail.From = new MailAddress("sclemons@calstripsteel.com");
+                    mail.From = new MailAddress("noreply@calstripsteel.com");
                     mail.Subject = brh + " - Daily";
                     mail.Body = "Report attached";
 
@@ -399,7 +399,7 @@ namespace PRO_Metrics_NET
                     mail.Attachments.Add(attach);
 
                     SmtpServer.Port = 587;
-                    SmtpServer.Credentials = new System.Net.NetworkCredential("sclemons@calstripsteel.com", "Smet@524");
+                    SmtpServer.Credentials = new System.Net.NetworkCredential("noreply@calstripsteel.com", "SW_M@t@l");
                     SmtpServer.EnableSsl = true;
 
                     SmtpServer.Send(mail);
